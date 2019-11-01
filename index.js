@@ -23,15 +23,31 @@ const findFromEnv = input => (env[input] === undefined) ? null : env[input]
 
 const skipParser = inputExp => {
   if (!inputExp.startsWith('(')) return null
-  inputExp = inputExp.slice(1).trim()
+  inputExp = inputExp.slice(1)
   let count = 1
+  let valid = '('
   while (count) {
     if (inputExp[0] === '(') count++
     if (inputExp[0] === ')') count--
-    inputExp = inputExp.slice(1).trim()
+    valid += inputExp[0]
+    inputExp = inputExp.slice(1)
     if (count === 0) break
   }
-  return inputExp.trim()
+  return [valid, inputExp.trim()]
+}
+
+// const lambdaParser = inputExp => {
+//   if (!inputExp.startsWith('lambda')) return null
+//   inputExp = inputExp.slice(6).trim()
+
+// }
+
+const quoteParser = inputExp => {
+  if (!inputExp.startsWith('quote')) return null
+  inputExp = inputExp.slice(5).trim()
+  const result = skipParser(inputExp)
+  if (!result) return null
+  return result
 }
 
 const beginParser = inputExp => {
@@ -69,7 +85,7 @@ const ifParser = inputExp => {
   const result = lispParser(inputExp)
   inputExp = result[1].trim()
   if (result[0]) return lispParser(inputExp)
-  inputExp = skipParser(inputExp)
+  inputExp = skipParser(inputExp)[1]
   console.log(inputExp)
   if (inputExp[0] === '(') return lispParser(inputExp)
   return ['', inputExp]
@@ -92,7 +108,7 @@ const operatorParser = inputExp => {
 const mainParsers = input => {
   if (!input.startsWith('(')) return null
   input = input.slice(1).trim()
-  const result = beginParser(input) || defineParser(input) || ifParser(input) || operatorParser(input)
+  const result = quoteParser(input) || beginParser(input) || defineParser(input) || ifParser(input) || operatorParser(input)
   return result
 }
 
@@ -105,5 +121,5 @@ const lispParser = input => {
   return [findFromEnv(result[0]), result[1].trim()]
 }
 
-console.log(lispParser('( begin ( define x 12 ) ( define y 1 ) ( if ( < x y ) ( + ( + x y ) ( - x y ) ) ( * x y ) ) )'))
+console.log(lispParser('( if ( > 5 10 ) ( * 1 4 ) ( - 2 1 ) )'))
 console.log(env)
