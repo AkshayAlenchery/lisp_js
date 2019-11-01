@@ -86,7 +86,6 @@ const ifParser = inputExp => {
   inputExp = result[1].trim()
   if (result[0]) return lispParser(inputExp)
   inputExp = skipParser(inputExp)[1]
-  console.log(inputExp)
   if (inputExp[0] === '(') return lispParser(inputExp)
   return ['', inputExp]
 }
@@ -121,5 +120,9 @@ const lispParser = input => {
   return [findFromEnv(result[0]), result[1].trim()]
 }
 
-console.log(lispParser('( if ( > 5 10 ) ( * 1 4 ) ( - 2 1 ) )'))
+console.log(lispParser('( if ( > 5 10 ) ( * 1 4 ) ( - 2 1 ) )')[0])
+console.log(lispParser('( * pi 10 10 )')[0])
+console.log(lispParser('( begin ( * 1 2 ) ( * 3 7 ) )')[0])
+console.log(lispParser('( begin ( define r 10 ) ( * pi ( * r r ) ) )')[0])
+console.log(lispParser('( begin ( define x 12 ) ( define y 1 ) ( if ( < x y ) ( + ( + x y ) ( * x y ) ) ( - x y ) ) )')[0])
 console.log(env)
