@@ -22,7 +22,16 @@ const variableParser = input => {
 const findFromEnv = input => (env[input] === undefined) ? null : env[input]
 
 const skipParser = inputExp => {
-
+  if (!inputExp.startsWith('(')) return null
+  inputExp = inputExp.slice(1).trim()
+  let count = 1
+  while (count) {
+    if (inputExp[0] === '(') count++
+    if (inputExp[0] === ')') count--
+    inputExp = inputExp.slice(1).trim()
+    if (count === 0) break
+  }
+  return inputExp.trim()
 }
 
 const beginParser = inputExp => {
@@ -60,7 +69,8 @@ const ifParser = inputExp => {
   const result = lispParser(inputExp)
   inputExp = result[1].trim()
   if (result[0]) return lispParser(inputExp)
-  inputExp = inputExp.slice(inputExp.indexOf(')') + 1).trim()
+  inputExp = skipParser(inputExp)
+  console.log(inputExp)
   if (inputExp[0] === '(') return lispParser(inputExp)
   return ['', inputExp]
 }
